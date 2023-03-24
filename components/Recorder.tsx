@@ -19,15 +19,15 @@ const SyntaxHighlighter = dynamic(
   { ssr: false }
 );
 
-const darcula = dynamic(
-  async () => {
-    const { darcula } = await import(
-      'react-syntax-highlighter/dist/esm/styles/hljs'
-    );
-    return darcula;
-  },
-  { ssr: false }
-);
+// const darcula = dynamic(
+//   async () => {
+//     const { darcula } = await import(
+//       'react-syntax-highlighter/dist/esm/styles/hljs'
+//     );
+//     return darcula;
+//   },
+//   { ssr: false }
+// );
 
 interface Message {
   role: string;
@@ -193,7 +193,7 @@ const Recorder: React.FC = () => {
     const codeSnippetRegex = /```([\s\S]*?)```/g;
     return content.replace(codeSnippetRegex, (match, code) => {
       const highlightedCode = (
-        <SyntaxHighlighter language="javascript" style={darcula}>
+        <SyntaxHighlighter language="javascript">
           {code.trim()}
         </SyntaxHighlighter>
       );
