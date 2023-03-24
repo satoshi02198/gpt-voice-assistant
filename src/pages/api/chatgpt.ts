@@ -1,6 +1,24 @@
 import fetch from 'node-fetch';
+import type { NextApiRequest, NextApiResponse } from 'next';
 
-export default async function handler(req, res) {
+interface Message {
+  role: string;
+  content: string;
+}
+
+interface Choice {
+  message: Message;
+}
+
+interface OpenAIResponse {
+  choices: Choice[];
+  error?: string;
+}
+
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
   try {
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -14,7 +32,7 @@ export default async function handler(req, res) {
       }),
     });
 
-    const { choices, error } = await response.json();
+    const { choices, error } = (await response.json()) as OpenAIResponse;
 
     if (response.ok) {
       res.json(choices[0].message);

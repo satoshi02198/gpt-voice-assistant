@@ -1,10 +1,22 @@
 import { PaperAirplaneIcon } from '@heroicons/react/24/solid';
-import { useState } from 'react';
+import { ChangeEvent, FormEvent, useState } from 'react';
 
-const ChatInput = ({ updateMessageFromWhisper, setAudioArray }) => {
+interface ChatInputProps {
+  updateMessageFromWhisper: (message: string) => void;
+  setAudioArray: (
+    fn: (
+      prev: Array<{ audioUrl: string | null }>
+    ) => Array<{ audioUrl: string | null }>
+  ) => void;
+}
+
+const ChatInput: React.FC<ChatInputProps> = ({
+  updateMessageFromWhisper,
+  setAudioArray,
+}) => {
   const [prompt, setPrompt] = useState('');
 
-  const sendMessage = async (e) => {
+  const sendMessage = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!prompt) return;
 
@@ -25,7 +37,9 @@ const ChatInput = ({ updateMessageFromWhisper, setAudioArray }) => {
           type="text"
           placeholder="Type your message here..."
           value={prompt}
-          onChange={(e) => setPrompt(e.target.value)}
+          onChange={(e: ChangeEvent<HTMLInputElement>) =>
+            setPrompt(e.target.value)
+          }
         />
 
         <button

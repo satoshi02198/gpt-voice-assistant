@@ -1,12 +1,16 @@
 import { client } from '../../../lib/clients/googleTextToSpeech';
+import { NextApiRequest, NextApiResponse } from 'next';
 
-export default async function handler(req, res) {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
   if (req.method === 'POST') {
     const request = {
       input: { text: req.body.text },
       //? select the language, voice, and audio encoding of the output
       voice: { languageCode: 'en-US', ssmGender: 'FEMALE' },
-      audioConfig: { audioEncoding: 'MP3' },
+      audioConfig: { audioEncoding: 'MP3' as const },
     };
     try {
       const [response] = await client.synthesizeSpeech(request);

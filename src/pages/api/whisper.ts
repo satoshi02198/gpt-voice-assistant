@@ -2,6 +2,7 @@ const FormData = require('form-data');
 import { withFileUpload } from 'next-multiparty';
 import { createReadStream } from 'fs';
 import fetch from 'node-fetch';
+import { NextApiRequest, NextApiResponse } from 'next';
 
 export const config = {
   api: {
@@ -9,7 +10,12 @@ export const config = {
   },
 };
 
-export default withFileUpload(async (req, res) => {
+interface WhisperResponse {
+  text: string;
+  error?: any;
+}
+
+export default withFileUpload(async (req: any, res: NextApiResponse) => {
   const file = req.file;
 
   if (!file) {
@@ -33,7 +39,7 @@ export default withFileUpload(async (req, res) => {
     }
   );
 
-  const { text, error } = await response.json();
+  const { text, error } = (await response.json()) as WhisperResponse;
   if (response.ok) {
     res.status(200).json({ text: text });
   } else {

@@ -4,6 +4,12 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import dynamic from 'next/dynamic';
 import { fetchWithRetry } from '../utils/fetchWithRetry';
 import ChatInput from './ChatInput';
+import Skelton from './layouts/Skelton';
+import Toggle from './toggleButtons/Toggle';
+// import { darcula } from 'react-syntax-highlighter/dist/esm/styles/hljs';
+// import LightProps from 'react-syntax-highlighter';
+// import Style from 'react-syntax-highlighter/dist/esm/styles/hljs';
+// import { Light as SyntaxHighlighter } from 'react-syntax-highlighter';
 
 const SyntaxHighlighter = dynamic(
   async () => {
@@ -23,11 +29,21 @@ const darcula = dynamic(
   { ssr: false }
 );
 
-const Recorder = () => {
-  const [messageArray, setMessageArray] = useState([]);
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [audioArray, setAudioArray] = useState([]);
+interface Message {
+  role: string;
+  content: string;
+}
+
+interface AudioData {
+  audioUrl: string | null;
+}
+
+const Recorder: React.FC = () => {
+  const [messageArray, setMessageArray] = useState<Message[]>([]);
+  const [error, setError] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(false);
+  const [audioArray, setAudioArray] = useState<AudioData[]>([]);
+  const [sentGTTS, setSentGTTS] = useState<boolean>(false);
 
   const combinedArray = messageArray.map((message, index) => {
     const audio = audioArray[index]?.audioUrl || null;
@@ -45,7 +61,7 @@ const Recorder = () => {
   }, [messageArray]);
 
   //? get from google text to speech
-  const getResFromGTTS = async (text) => {
+  const getResFromGTTS = async (text: string) => {
     try {
       const response = await fetch('/api/googleTToS', {
         method: 'POST',
@@ -113,12 +129,15 @@ const Recorder = () => {
       const res = await getResFromChatGPT();
       console.log('🚀 ~ getResFromChatGPTAndGTTS ~ resFromChatGPT:', res);
 
-      if (res.content) {
+      if (res.content && sentGTTS) {
         setMessageArray((prev) => [...prev, res]);
         const newAudio = { audioUrl: null };
         const audio = await getResFromGTTS(res.content);
         newAudio.audioUrl = audio;
         setAudioArray((prev) => [...prev, newAudio]);
+      } else if (res.content && !sentGTTS) {
+        setMessageArray((prev) => [...prev, res]);
+        setAudioArray((prev) => [...prev, { audioUrl: null }]);
       }
       setLoading(false);
 
@@ -139,7 +158,7 @@ const Recorder = () => {
   };
 
   //? record and update
-  const recording = async (audioBlob) => {
+  const recording = async (audioBlob: Blob) => {
     const audioUrl = URL.createObjectURL(audioBlob);
     setAudioArray((prev) => [...prev, { audioUrl: audioUrl }]);
     const formData = new FormData();
@@ -163,14 +182,14 @@ const Recorder = () => {
   //?messageStyle depending on role
   const messageStyles = (role) => {
     if (role === 'user') {
-      return 'bg-lime-200 text-black px-8 py-4 rounded-sm ';
+      return 'bg-lime-200 text-black px-8 py-4 rounded-lg ';
     } else {
-      return 'bg-gray-200 text-black px-8 py-4 rounded-sm ';
+      return 'bg-gray-200 text-black px-8 py-4 rounded-lg ';
     }
   };
 
   //? formatCodeSnippets
-  const formatCodeSnippets = (content) => {
+  const formatCodeSnippets = (content: string) => {
     const codeSnippetRegex = /```([\s\S]*?)```/g;
     return content.replace(codeSnippetRegex, (match, code) => {
       const highlightedCode = (
@@ -192,8 +211,8 @@ const Recorder = () => {
 
   return (
     <>
-      <div>
-        <div className="space-y-6 px-4 py-4 ">
+      <div className="">
+        <div className="space-y-6 px-4 pt-10 pb-40 ">
           {combinedArray.map((message, index) => (
             <div key={index} className={messageStyles(message.role)}>
               <div
@@ -221,21 +240,25 @@ const Recorder = () => {
               )}
             </div>
           ))}
+          {loading && <Skelton />}
         </div>
         {loading ? (
-          <>
-            <p>loading....</p>
-          </>
+          <></>
         ) : (
           <>
-            <div className="flex justify-center items-center mx-auto w-[90%]">
-              <ChatInput
-                updateMessageFromWhisper={updateMessageFromWhisper}
-                setAudioArray={setAudioArray}
-              />
-              <AudioRecorder
-                onRecordingComplete={(audioBlob) => recording(audioBlob)}
-              />
+            <div className="flex flex-col items-center z-50 fixed bottom-1  w-[90%]  bg-gray-100 ">
+              <div className="flex justify-center items-center px-8 w-full">
+                <ChatInput
+                  updateMessageFromWhisper={updateMessageFromWhisper}
+                  setAudioArray={setAudioArray}
+                />
+                <AudioRecorder
+                  onRecordingComplete={(audioBlob) => recording(audioBlob)}
+                />
+              </div>
+              <div>
+                <Toggle setSentGTTS={setSentGTTS} />
+              </div>
             </div>
             {error && <p>{error}</p>}
           </>
