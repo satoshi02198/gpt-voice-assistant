@@ -57,6 +57,7 @@ const Recorder: React.FC = () => {
       messageArray[messageArray.length - 1].role !== 'assistant'
     ) {
       getResFromChatGPTAndGTTS();
+      setSentGTTS(false);
     }
   }, [messageArray]);
 
