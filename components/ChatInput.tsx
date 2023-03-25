@@ -31,7 +31,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
 
   return (
     <div className="bg-gray-50/50 text-gray-700 rounded-lg text-sm flex-grow">
-      <form onSubmit={sendMessage} className="p-5 space-x-5 flex">
+      <form onSubmit={sendMessage} className="p-4 sm:p-5 space-x-5 flex">
         <input
           className="bg-transparent focus:outline-none flex-1"
           type="text"

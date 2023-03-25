@@ -6,6 +6,8 @@ import { fetchWithRetry } from '../utils/fetchWithRetry';
 import ChatInput from './ChatInput';
 import Skelton from './layouts/Skelton';
 import Toggle from './toggleButtons/Toggle';
+import Select from 'react-select';
+import ReactSelect from 'react-select';
 // import { darcula } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 // import LightProps from 'react-syntax-highlighter';
 // import Style from 'react-syntax-highlighter/dist/esm/styles/hljs';
@@ -44,6 +46,7 @@ const Recorder: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [audioArray, setAudioArray] = useState<AudioData[]>([]);
   const [sentGTTS, setSentGTTS] = useState<boolean>(false);
+  const [voiceModel, setVoiceModel] = useState<string>('');
 
   const combinedArray = messageArray.map((message, index) => {
     const audio = audioArray[index]?.audioUrl || null;
@@ -57,7 +60,7 @@ const Recorder: React.FC = () => {
       messageArray[messageArray.length - 1].role !== 'assistant'
     ) {
       getResFromChatGPTAndGTTS();
-      setSentGTTS(false);
+      // setSentGTTS(false);
     }
   }, [messageArray]);
 
@@ -67,7 +70,7 @@ const Recorder: React.FC = () => {
       const response = await fetch('/api/googleTToS', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: text }),
+        body: JSON.stringify({ text: text, voiceModel: voiceModel }),
       });
       if (response.ok) {
         const audioContent = await response.arrayBuffer();
@@ -213,7 +216,7 @@ const Recorder: React.FC = () => {
   return (
     <>
       <div className="">
-        <div className="space-y-6 px-4 pt-10 pb-40 ">
+        <div className="space-y-6 px-4 pt-10 pb-20 ">
           {combinedArray.map((message, index) => (
             <div key={index} className={messageStyles(message.role)}>
               <div
@@ -243,27 +246,33 @@ const Recorder: React.FC = () => {
           ))}
           {loading && <Skelton />}
         </div>
-        {loading ? (
-          <></>
-        ) : (
-          <>
-            <div className="flex flex-col items-center z-50 fixed bottom-1  w-[90%]  bg-gray-100 ">
-              <div className="flex justify-center items-center px-8 w-full">
-                <ChatInput
-                  updateMessageFromWhisper={updateMessageFromWhisper}
-                  setAudioArray={setAudioArray}
-                />
-                <AudioRecorder
-                  onRecordingComplete={(audioBlob) => recording(audioBlob)}
-                />
-              </div>
-              <div>
-                <Toggle setSentGTTS={setSentGTTS} />
-              </div>
-            </div>
-            {error && <p>{error}</p>}
-          </>
-        )}
+
+        {/* input area */}
+        <div className="flex flex-col items-center justify-center z-50   w-full  bg-gray-100 ">
+          <div className="flex justify-center items-center space-x-1 px-2 sm:px-8 w-full">
+            <ChatInput
+              updateMessageFromWhisper={updateMessageFromWhisper}
+              setAudioArray={setAudioArray}
+            />
+            <AudioRecorder
+              onRecordingComplete={(audioBlob) => recording(audioBlob)}
+            />
+          </div>
+
+          {/* GTTS setting */}
+          <div className="flex justify-center space-x-2">
+            <Select
+              options={[
+                { value: 'en-GB', label: 'en-GB' },
+                { value: 'en-US', label: 'en-US' },
+                { value: 'ja-JP', label: 'ja(日本語)' },
+              ]}
+              onChange={(e) => setVoiceModel(e.value)}
+            />
+            <Toggle setSentGTTS={setSentGTTS} />
+          </div>
+        </div>
+        {error && <p>{error}</p>}
       </div>
     </>
   );

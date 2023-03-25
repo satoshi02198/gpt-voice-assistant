@@ -1,5 +1,9 @@
 import { client } from '../../../lib/clients/googleTextToSpeech';
 import { NextApiRequest, NextApiResponse } from 'next';
+// import ISynthesizeSpeechRequest from '@google-cloud/text-to-speech/build/src';
+// import { protos } from '@google-cloud/text-to-speech';
+
+// const SsmlVoiceGender = protos.google.cloud.texttospeech.v1.SsmlVoiceGender;
 
 export default async function handler(
   req: NextApiRequest,
@@ -9,11 +13,31 @@ export default async function handler(
     const request = {
       input: { text: req.body.text },
       //? select the language, voice, and audio encoding of the output
-      voice: { languageCode: 'en-US', ssmGender: 'FEMALE' },
+      voice: {
+        // languageCode: 'ja-JP',
+        // name: 'ja-JP-Standard-A',
+        // ssmlGender: 'FEMALE',
+        // naturalSampleRateHertz: 24000,
+        languageCode: req.body.voiceModel,
+        name: `${req.body.voiceModel}-Standard-B`,
+        ssmlGender: 'MALE',
+        naturalSampleRateHertz: 24000,
+        //     languageCode:  'es-US' ,
+        // name: 'es-US-Standard-A',
+        // ssmlGender: 'FEMALE',
+        // naturalSampleRateHertz: 24000
+      },
       audioConfig: { audioEncoding: 'MP3' as const },
     };
+
+    // const [result] = await client.listVoices({});
+    // const voices = result.voices;
+    // console.log('🚀 ~ voices:', voices);
+
     try {
       const [response] = await client.synthesizeSpeech(request);
+      console.log('🚀 ~ response:', response);
+
       const audioContent = response.audioContent;
       console.log('🚀 ~ handler ~ audioContent:', audioContent);
       res.setHeader('Content-Type', 'audio/mpeg');
