@@ -1,16 +1,16 @@
 import { client } from '../../../lib/clients/googleTextToSpeech';
 import { NextApiRequest, NextApiResponse } from 'next';
 // import ISynthesizeSpeechRequest from '@google-cloud/text-to-speech/build/src';
-// import { protos } from '@google-cloud/text-to-speech';
+import { protos } from '@google-cloud/text-to-speech';
 
-// const SsmlVoiceGender = protos.google.cloud.texttospeech.v1.SsmlVoiceGender;
+const SsmlVoiceGender = protos.google.cloud.texttospeech.v1.SsmlVoiceGender;
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
   if (req.method === 'POST') {
-    const request = {
+    const request: any = {
       input: { text: req.body.text },
       //? select the language, voice, and audio encoding of the output
       voice: {
@@ -35,7 +35,7 @@ export default async function handler(
     // console.log('🚀 ~ voices:', voices);
 
     try {
-      const [response] = await client.synthesizeSpeech(request);
+      const [response]: any = await client.synthesizeSpeech(request);
       console.log('🚀 ~ response:', response);
 
       const audioContent = response.audioContent;
