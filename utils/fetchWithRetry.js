@@ -2,7 +2,7 @@ export const fetchWithRetry = async (
   url,
   options,
   retries = 3,
-  backoff = 500
+  backoff = 1000
 ) => {
   try {
     const response = await fetch(url, options);

@@ -8,6 +8,12 @@ import Skelton from './layouts/Skelton';
 import Toggle from './toggleButtons/Toggle';
 import Select from 'react-select';
 import ReactSelect from 'react-select';
+import {
+  languageModelOptions,
+  roleModelOptions,
+  characterModelOptions,
+  wordsLongOptions,
+} from '../lib/modelsForGPT';
 // import { darcula } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 // import LightProps from 'react-syntax-highlighter';
 // import Style from 'react-syntax-highlighter/dist/esm/styles/hljs';
@@ -40,6 +46,11 @@ interface AudioData {
   audioUrl: string | null;
 }
 
+interface MessageSchema {
+  role: 'assistant' | 'user' | 'system';
+  content: string;
+}
+
 const Recorder: React.FC = () => {
   const [messageArray, setMessageArray] = useState<Message[]>([]);
   const [error, setError] = useState<string>('');
@@ -47,12 +58,17 @@ const Recorder: React.FC = () => {
   const [audioArray, setAudioArray] = useState<AudioData[]>([]);
   const [sentGTTS, setSentGTTS] = useState<boolean>(false);
   const [voiceModel, setVoiceModel] = useState<string>('');
+  const [role, setRole] = useState<string>('');
+  const [charactor, setCharactor] = useState<string>('');
+  const [wordLong, setWordLong] = useState<string>('');
 
   const combinedArray = messageArray.map((message, index) => {
     const audio = audioArray[index]?.audioUrl || null;
 
     return { ...message, audioUrl: audio };
   });
+
+  const botContext = `you have to act like a ${role}. your response is always within ${wordLong}.`;
 
   useEffect(() => {
     if (
@@ -216,7 +232,7 @@ const Recorder: React.FC = () => {
   return (
     <>
       <div className="">
-        <div className="space-y-6 px-4 pt-10 pb-20 ">
+        <div className="space-y-6 px-4 pt-10 pb-60 ">
           {combinedArray.map((message, index) => (
             <div key={index} className={messageStyles(message.role)}>
               <div
@@ -247,32 +263,57 @@ const Recorder: React.FC = () => {
           {loading && <Skelton />}
         </div>
 
-        {/* input area */}
-        <div className="flex flex-col items-center justify-center z-50   w-full  bg-gray-100 ">
-          <div className="flex justify-center items-center space-x-1 px-2 sm:px-8 w-full">
-            <ChatInput
-              updateMessageFromWhisper={updateMessageFromWhisper}
-              setAudioArray={setAudioArray}
-            />
-            <AudioRecorder
-              onRecordingComplete={(audioBlob) => recording(audioBlob)}
-            />
+        <div className="sticky inset-x-0 bottom-0 ">
+          {/* GTTS setting */}
+          <div className="flex justify-between items-center space-x-2 bg-gray-500 p-3 rounded-t-md">
+            <div className="flex justify-center items-center space-x-2">
+              {' '}
+              <Select
+                options={languageModelOptions}
+                menuPlacement="top"
+                onChange={(e) => setVoiceModel(e.value)}
+              />
+              <Toggle setSentGTTS={setSentGTTS} />
+            </div>
+            <div className="flex  items-center space-x-2">
+              <Select
+                options={roleModelOptions}
+                menuPlacement="top"
+                onChange={(e) => setRole(e.value)}
+              />
+              <Select
+                options={wordsLongOptions}
+                menuPlacement="top"
+                onChange={(e) => setWordLong(e.value)}
+              />
+              <button
+                className="px-4 py-2 bg-lime-200 rounded-md hover:bg-lime-300 active:bg-lime-400 focus:bg-lime-300 transition duration-200"
+                onClick={() =>
+                  setMessageArray((prev) => [
+                    ...prev,
+                    { role: 'assistant', content: botContext },
+                  ])
+                }
+              >
+                Set Role
+              </button>
+            </div>
           </div>
 
-          {/* GTTS setting */}
-          <div className="flex justify-center space-x-2">
-            <Select
-              options={[
-                { value: 'en-GB', label: 'en-GB' },
-                { value: 'en-US', label: 'en-US' },
-                { value: 'ja-JP', label: 'ja(日本語)' },
-              ]}
-              onChange={(e) => setVoiceModel(e.value)}
-            />
-            <Toggle setSentGTTS={setSentGTTS} />
+          {/* input area */}
+          <div className="flex flex-col items-center justify-center z-50   w-full  bg-gray-100 ">
+            <div className="flex justify-center items-center space-x-1 px-2 sm:px-8 w-full">
+              <ChatInput
+                updateMessageFromWhisper={updateMessageFromWhisper}
+                setAudioArray={setAudioArray}
+              />
+              <AudioRecorder
+                onRecordingComplete={(audioBlob) => recording(audioBlob)}
+              />
+            </div>
           </div>
+          {error && <p>{error}</p>}
         </div>
-        {error && <p>{error}</p>}
       </div>
     </>
   );
