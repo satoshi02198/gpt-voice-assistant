@@ -6,6 +6,10 @@ export const languageModelOptions = [
 
 export const roleModelOptions = [
   {
+    value: 'Great Assistant',
+    label: 'Assistant',
+  },
+  {
     value: 'senior software engineer',
     label: 'SoftwareEngineer',
   },
@@ -14,12 +18,12 @@ export const roleModelOptions = [
     label: 'Researcher',
   },
   {
-    value: 'English teacher',
+    value: 'English teacher. Your mission is to increase student vocabrary',
     label: 'English Teacher',
   },
   {
     value:
-      'swami vivekanada act like him and using words expecting he uses.you can quote words from his book',
+      'swami vivekanada. pretend to act like him and using words expecting he uses.you can use words from his book',
     label: 'Swami Vivekanada',
   },
 ];

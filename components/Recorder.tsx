@@ -73,6 +73,11 @@ const Recorder: React.FC = () => {
   useEffect(() => {
     if (
       messageArray.length > 0 &&
+      messageArray[messageArray.length - 1].role === 'system'
+    )
+      return;
+    if (
+      messageArray.length > 0 &&
       messageArray[messageArray.length - 1].role !== 'assistant'
     ) {
       getResFromChatGPTAndGTTS();
@@ -124,6 +129,7 @@ const Recorder: React.FC = () => {
       }
     } catch (error) {
       console.error('Error at getResFromChatGPT', error);
+      setError(error.message);
       setLoading(false);
     }
   };
@@ -131,6 +137,7 @@ const Recorder: React.FC = () => {
   //? get response from chatGPT and GTTS
   const getResFromChatGPTAndGTTS = async () => {
     setLoading(true);
+    setError('');
     // try {
     //   console.log('messagesArray in gptRequest fn', messageArray);
     //   const toChatGPT = await fetchWithRetry('/api/chatgpt', {
@@ -194,17 +201,19 @@ const Recorder: React.FC = () => {
       updateMessageFromWhisper(text);
       setError(error);
     } catch (error) {
-      setError(error.message);
+      setError(error);
       console.log('Error:', error);
     }
   };
 
   //?messageStyle depending on role
-  const messageStyles = (role) => {
+  const messageStyles = (role: string) => {
     if (role === 'user') {
       return 'bg-lime-200 text-black px-8 py-4 rounded-lg ';
-    } else {
+    } else if (role === 'assistant') {
       return 'bg-gray-200 text-black px-8 py-4 rounded-lg ';
+    } else {
+      return 'bg-orange-200 text-black px-8 py-4 rounded-lg ';
     }
   };
 
@@ -231,22 +240,26 @@ const Recorder: React.FC = () => {
 
   return (
     <>
-      <div className="">
-        <div className="space-y-6 px-4 pt-10 pb-60 ">
-          {combinedArray.map((message, index) => (
-            <div key={index} className={messageStyles(message.role)}>
-              <div
-                dangerouslySetInnerHTML={{
-                  __html: formatCodeSnippets(message.content),
-                }}
-                className="text-xl"
-              ></div>
-              {message.audioUrl && (
-                <div className="flex py-4">
-                  <audio controls className="h-10">
-                    <source src={message.audioUrl} type="audio/mpeg" />
-                  </audio>
-                  {/* {playingAudio && (
+      <div className="flex-1 space-y-6 px-4 pt-10 pb-60 overflow-auto overflow-x-hidden">
+        {combinedArray.map((message, index) => (
+          <div key={index} className={messageStyles(message.role)}>
+            <div
+              dangerouslySetInnerHTML={{
+                __html: formatCodeSnippets(message.content),
+              }}
+              className="text-xl"
+            ></div>
+            {message.role === 'system' && (
+              <p className="px-4 py-2 mt-2 bg-amber-300 w-1/5">
+                character setting
+              </p>
+            )}
+            {message.audioUrl && (
+              <div className="flex py-4">
+                <audio controls className="h-10">
+                  <source src={message.audioUrl} type="audio/mpeg" />
+                </audio>
+                {/* {playingAudio && (
                     <button
                       onClick={() => {
                         stopAudio();
@@ -256,63 +269,86 @@ const Recorder: React.FC = () => {
                       Stop
                     </button>
                   )} */}
-                </div>
-              )}
-            </div>
-          ))}
-          {loading && <Skelton />}
+              </div>
+            )}
+          </div>
+        ))}
+        {loading && <Skelton />}
+        {error && (
+          <p className="text-white">
+            <span className="text-red-400 font-semibold">Error: </span>
+            {error}
+          </p>
+        )}
+      </div>{' '}
+      <div className="">
+        {/* GTTS setting */}
+        <div className="flex justify-between items-center space-x-2 bg-gray-500 p-3 rounded-t-md">
+          <div className="flex justify-center items-center space-x-4">
+            {' '}
+            <Select
+              options={languageModelOptions}
+              menuPlacement="top"
+              onChange={(e) => setVoiceModel(e.value)}
+            />
+            <Toggle setSentGTTS={setSentGTTS} />
+          </div>
+          <div className="flex justify-end flex-1  items-center space-x-4">
+            <Select
+              placeholder="Role"
+              styles={{
+                control: (styles) => ({
+                  ...styles,
+                  width: '200px',
+                }),
+              }}
+              options={roleModelOptions}
+              menuPlacement="top"
+              onChange={(e) => setRole(e.value)}
+            />
+            <Select
+              placeholder="How long do you want to respond?"
+              styles={{
+                control: (styles) => ({
+                  ...styles,
+                  width: '250pxpx',
+                }),
+              }}
+              options={wordsLongOptions}
+              menuPlacement="top"
+              onChange={(e) => setWordLong(e.value)}
+            />
+            <button
+              className="px-4 py-2 bg-lime-200 rounded-md hover:bg-lime-300 active:bg-lime-400 focus:bg-lime-300 transition duration-200"
+              onClick={() => {
+                if (!role && !wordLong) return;
+                const roleText = role && `you have to act like a ${role}.`;
+                const wordLongText =
+                  wordLong && `your response is always within ${wordLong}.`;
+
+                setMessageArray((prev) => [
+                  ...prev,
+                  { role: 'system', content: `${roleText}${wordLongText}` },
+                ]);
+                setAudioArray((prev) => [...prev, { audioUrl: null }]);
+              }}
+            >
+              Set Role
+            </button>
+          </div>
         </div>
 
-        <div className="sticky inset-x-0 bottom-0 ">
-          {/* GTTS setting */}
-          <div className="flex justify-between items-center space-x-2 bg-gray-500 p-3 rounded-t-md">
-            <div className="flex justify-center items-center space-x-2">
-              {' '}
-              <Select
-                options={languageModelOptions}
-                menuPlacement="top"
-                onChange={(e) => setVoiceModel(e.value)}
-              />
-              <Toggle setSentGTTS={setSentGTTS} />
-            </div>
-            <div className="flex  items-center space-x-2">
-              <Select
-                options={roleModelOptions}
-                menuPlacement="top"
-                onChange={(e) => setRole(e.value)}
-              />
-              <Select
-                options={wordsLongOptions}
-                menuPlacement="top"
-                onChange={(e) => setWordLong(e.value)}
-              />
-              <button
-                className="px-4 py-2 bg-lime-200 rounded-md hover:bg-lime-300 active:bg-lime-400 focus:bg-lime-300 transition duration-200"
-                onClick={() =>
-                  setMessageArray((prev) => [
-                    ...prev,
-                    { role: 'assistant', content: botContext },
-                  ])
-                }
-              >
-                Set Role
-              </button>
-            </div>
+        {/* input area */}
+        <div className="flex flex-col items-center justify-center z-50   w-full  bg-gray-100 ">
+          <div className="flex justify-center items-center space-x-1 px-2 sm:px-8 w-full">
+            <ChatInput
+              updateMessageFromWhisper={updateMessageFromWhisper}
+              setAudioArray={setAudioArray}
+            />
+            <AudioRecorder
+              onRecordingComplete={(audioBlob) => recording(audioBlob)}
+            />
           </div>
-
-          {/* input area */}
-          <div className="flex flex-col items-center justify-center z-50   w-full  bg-gray-100 ">
-            <div className="flex justify-center items-center space-x-1 px-2 sm:px-8 w-full">
-              <ChatInput
-                updateMessageFromWhisper={updateMessageFromWhisper}
-                setAudioArray={setAudioArray}
-              />
-              <AudioRecorder
-                onRecordingComplete={(audioBlob) => recording(audioBlob)}
-              />
-            </div>
-          </div>
-          {error && <p>{error}</p>}
         </div>
       </div>
     </>
