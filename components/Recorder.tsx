@@ -283,17 +283,18 @@ const Recorder: React.FC = () => {
       </div>{' '}
       <div className="">
         {/* GTTS setting */}
-        <div className="flex justify-between items-center space-x-2 bg-gray-500 p-3 rounded-t-md">
-          <div className="flex justify-center items-center space-x-4">
+        <div className="sm:flex sm:justify-between sm:items-center sm:space-x-2 bg-gray-500 sm:p-3 sm:rounded-t-md">
+          <div className="space-y-2 sm:space-y-0 sm:flex sm:justify-center sm:items-center sm:space-x-4">
             {' '}
             <Select
+              placeholder="Select language"
               options={languageModelOptions}
               menuPlacement="top"
               onChange={(e) => setVoiceModel(e.value)}
             />
             <Toggle setSentGTTS={setSentGTTS} />
           </div>
-          <div className="flex justify-end flex-1  items-center space-x-4">
+          <div className="space-y-2  pb-2 sm:space-y-0 sm:flex sm:justify-end sm:flex-1  sm:items-center sm:space-x-4">
             <Select
               placeholder="Role"
               styles={{
