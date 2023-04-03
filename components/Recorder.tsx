@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { AudioRecorder } from 'react-audio-voice-recorder';
+import { AudioRecorder, useAudioRecorder } from 'react-audio-voice-recorder';
 import { renderToStaticMarkup } from 'react-dom/server';
 import dynamic from 'next/dynamic';
 import { fetchWithRetry } from '../utils/fetchWithRetry';
@@ -52,6 +52,11 @@ interface MessageSchema {
 }
 
 const Recorder: React.FC = () => {
+  //? react-audio-voice-recorder
+  const { isRecording, isPaused, startRecording } = useAudioRecorder();
+  //? control recorder outside of component
+  const recorderControls = useAudioRecorder();
+
   const [messageArray, setMessageArray] = useState<Message[]>([]);
   const [error, setError] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
@@ -240,7 +245,7 @@ const Recorder: React.FC = () => {
 
   return (
     <>
-      <div className="flex-1 space-y-6 px-4 pt-10 pb-60 overflow-auto overflow-x-hidden">
+      <div className="flex-1 space-y-6 px-4 py-10 overflow-auto overflow-x-hidden">
         {combinedArray.map((message, index) => (
           <div key={index} className={messageStyles(message.role)}>
             <div
@@ -273,7 +278,7 @@ const Recorder: React.FC = () => {
             )}
           </div>
         ))}
-        {loading && <Skelton />}
+
         {error && (
           <p className="text-white">
             <span className="text-red-400 font-semibold">Error: </span>
@@ -281,18 +286,37 @@ const Recorder: React.FC = () => {
           </p>
         )}
       </div>{' '}
+      {loading && <Skelton />}
       <div className="">
         {/* GTTS setting */}
         <div className="sm:flex sm:justify-between sm:items-center sm:space-x-2 bg-gray-500 sm:p-3 sm:rounded-t-md">
           <div className="space-y-2 sm:space-y-0 sm:flex sm:justify-center sm:items-center sm:space-x-4">
             {' '}
             <Select
+              styles={{
+                control: (styles) => ({
+                  ...styles,
+                  width: '180px',
+                }),
+              }}
               placeholder="Select language"
               options={languageModelOptions}
               menuPlacement="top"
               onChange={(e) => setVoiceModel(e.value)}
             />
             <Toggle setSentGTTS={setSentGTTS} />
+            {/* <button
+              className="bg-slate-300 py-2 px-4"
+              onClick={recorderControls.startRecording}
+            >
+              start recording
+            </button>
+            <button
+              className="bg-slate-300 py-2 px-4"
+              onClick={recorderControls.stopRecording}
+            >
+              stop recording
+            </button> */}
           </div>
           <div className="space-y-2  pb-2 sm:space-y-0 sm:flex sm:justify-end sm:flex-1  sm:items-center sm:space-x-4">
             <Select
@@ -300,7 +324,7 @@ const Recorder: React.FC = () => {
               styles={{
                 control: (styles) => ({
                   ...styles,
-                  width: '200px',
+                  width: '180px',
                 }),
               }}
               options={roleModelOptions}
@@ -308,11 +332,11 @@ const Recorder: React.FC = () => {
               onChange={(e) => setRole(e.value)}
             />
             <Select
-              placeholder="How long do you want to respond?"
+              placeholder="Response length"
               styles={{
                 control: (styles) => ({
                   ...styles,
-                  width: '250pxpx',
+                  width: '180px',
                 }),
               }}
               options={wordsLongOptions}
@@ -323,7 +347,8 @@ const Recorder: React.FC = () => {
               className="px-4 py-2 bg-lime-200 rounded-md hover:bg-lime-300 active:bg-lime-400 focus:bg-lime-300 transition duration-200"
               onClick={() => {
                 if (!role && !wordLong) return;
-                const roleText = role && `you have to act like a ${role}.`;
+                const roleText =
+                  role && `you have to pretend to act like a ${role}.`;
                 const wordLongText =
                   wordLong && `your response is always within ${wordLong}.`;
 
@@ -342,11 +367,14 @@ const Recorder: React.FC = () => {
         {/* input area */}
         <div className="flex flex-col items-center justify-center z-50   w-full  bg-gray-100 ">
           <div className="flex justify-center items-center space-x-1 px-2 sm:px-8 w-full">
+            {/* {!recorderControls.isRecording && ( */}
             <ChatInput
               updateMessageFromWhisper={updateMessageFromWhisper}
               setAudioArray={setAudioArray}
             />
+            {/* )} */}
             <AudioRecorder
+              recorderControls={recorderControls}
               onRecordingComplete={(audioBlob) => recording(audioBlob)}
             />
           </div>
