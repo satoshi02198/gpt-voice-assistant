@@ -45,7 +45,6 @@ interface MessageSchema {
   role: 'assistant' | 'user' | 'system';
   content: string;
 }
-// const Recorder: React.FC = ()
 export default function Home() {
   //? react-audio-voice-recorder
   const { isRecording, isPaused, startRecording } = useAudioRecorder();
