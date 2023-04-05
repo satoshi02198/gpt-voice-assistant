@@ -45,26 +45,31 @@ interface MessageSchema {
   role: 'assistant' | 'user' | 'system';
   content: string;
 }
+
 export default function Home() {
   //? react-audio-voice-recorder
   const { isRecording, isPaused, startRecording } = useAudioRecorder();
   //? control recorder outside of component
   const recorderControls = useAudioRecorder();
 
+  //? messages and Audios and combined
   const [messageArray, setMessageArray] = useState<Message[]>([]);
-  const [error, setError] = useState<string>('');
-  const [loading, setLoading] = useState<boolean>(false);
   const [audioArray, setAudioArray] = useState<AudioData[]>([]);
-  const [sentGTTS, setSentGTTS] = useState<boolean>(false);
-  const [voiceModel, setVoiceModel] = useState<string>('');
-  const [role, setRole] = useState<string>('');
-  const [wordLong, setWordLong] = useState<string>('');
-
   const combinedArray = messageArray.map((message, index) => {
     const audio = audioArray[index]?.audioUrl || null;
 
     return { ...message, audioUrl: audio };
   });
+
+  //? settings for GTTS and Chat GPT
+  const [sentGTTS, setSentGTTS] = useState<boolean>(false);
+  const [voiceModel, setVoiceModel] = useState<string>('');
+  const [role, setRole] = useState<string>('');
+  const [wordLong, setWordLong] = useState<string>('');
+
+  //? error and loading state
+  const [error, setError] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     if (
