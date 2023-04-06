@@ -9,6 +9,7 @@ import Skelton from '../../components/layouts/Skelton';
 import AccordionComponent from '../../components/layouts/Accordion';
 import SettingGTTS from '../../components/setting/SettingGTTS';
 import SettingChatGPT from '../../components/setting/SettingChatGPT';
+import { BarsArrowUpIcon, BarsArrowDownIcon } from '@heroicons/react/24/solid';
 // import { darcula } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 // import LightProps from 'react-syntax-highlighter';
 // import Style from 'react-syntax-highlighter/dist/esm/styles/hljs';
@@ -51,6 +52,8 @@ export default function Home() {
   const { isRecording, isPaused, startRecording } = useAudioRecorder();
   //? control recorder outside of component
   const recorderControls = useAudioRecorder();
+  //? for dropdown menu
+  const [isOpen, setIsOpen] = useState(false);
 
   //? messages and Audios and combined
   const [messageArray, setMessageArray] = useState<Message[]>([]);
@@ -177,7 +180,7 @@ export default function Home() {
   };
 
   //? updataMessageArray from recording
-  const updateMessageFromWhisper = async (userMessage) => {
+  const updateMessageFromWhisper = async (userMessage: string) => {
     const userMessageData = {
       role: 'user',
       content: userMessage,
@@ -203,7 +206,7 @@ export default function Home() {
       setError(error);
     } catch (error) {
       setError(error);
-      console.log('Error:', error);
+      console.log('Error in recording', error);
     }
   };
 
@@ -251,7 +254,7 @@ export default function Home() {
               className="text-xl"
             ></div>
             {message.role === 'system' && (
-              <p className="px-4 py-2 mt-2 bg-amber-300 w-1/5">
+              <p className="px-4 py-2 mt-2 bg-amber-300 sm:w-1/5">
                 character setting
               </p>
             )}
@@ -291,7 +294,7 @@ export default function Home() {
             </button> */}
       <div className="">
         {/* GTTS setting */}
-        <div className=" sm:flex sm:justify-between sm:items-center sm:space-x-2 bg-gray-300 sm:p-3 sm:rounded-t-md">
+        <div className="hidden sm:flex sm:justify-between sm:items-center sm:space-x-2 bg-gray-300 sm:p-2 sm:rounded-t-md">
           <SettingGTTS
             setVoiceModel={setVoiceModel}
             setSentGTTS={setSentGTTS}
@@ -304,6 +307,36 @@ export default function Home() {
             setMessageArray={setMessageArray}
             setAudioArray={setAudioArray}
           />
+        </div>
+
+        {isOpen && (
+          <div className="sm:hidden  bg-gray-100 p-2 ">
+            <SettingGTTS
+              setVoiceModel={setVoiceModel}
+              setSentGTTS={setSentGTTS}
+            />
+            <SettingChatGPT
+              role={role}
+              wordLong={wordLong}
+              setRole={setRole}
+              setWordLong={setWordLong}
+              setMessageArray={setMessageArray}
+              setAudioArray={setAudioArray}
+            />
+          </div>
+        )}
+
+        {/* dropdown */}
+        <div
+          className="sm:hidden bg-gray-200 w-full h-8 flex justify-between items-center hover:bg-gray-300 focus:bg-gray-300 active:bg-gray-400 transition duration-200 ease-in-out px-8"
+          onClick={() => setIsOpen(!isOpen)}
+        >
+          <p>Setting Assistant</p>
+          {isOpen ? (
+            <BarsArrowDownIcon className="w-6 h-6 text-gray-600" />
+          ) : (
+            <BarsArrowUpIcon className="w-6 h-6 text-gray-600" />
+          )}
         </div>
 
         {/* input area */}
