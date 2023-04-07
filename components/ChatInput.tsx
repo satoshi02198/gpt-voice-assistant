@@ -33,7 +33,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
     <div className="bg-gray-50/50 text-gray-700 rounded-lg text-sm flex-grow">
       <form onSubmit={sendMessage} className="p-2 sm:p-2 space-x-5 flex">
         <input
-          className="bg-transparent focus:outline-none flex-1"
+          className="border-0 focus:border-0 bg-transparent  flex-1"
           type="text"
           placeholder="Type your message here..."
           value={prompt}

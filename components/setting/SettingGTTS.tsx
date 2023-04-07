@@ -6,27 +6,32 @@ import { languageModelOptions } from '../../lib/modelsForGPT';
 type SettingGTTSProps = {
   setVoiceModel: Dispatch<SetStateAction<string>>;
   setSentGTTS: Dispatch<SetStateAction<boolean>>;
+  sentGTTS: boolean;
 };
 
 const SettingGTTS: React.FC<SettingGTTSProps> = ({
   setVoiceModel,
   setSentGTTS,
+  sentGTTS,
 }) => {
   return (
-    <div className="space-y-2 sm:space-y-0 sm:flex sm:justify-center sm:items-center sm:space-x-4">
-      <Select
-        styles={{
-          control: (styles) => ({
-            ...styles,
-            width: '180px',
-          }),
-        }}
-        placeholder="Select language"
-        options={languageModelOptions}
-        menuPlacement="top"
-        onChange={(e) => setVoiceModel(e.value)}
-      />
+    <div className=" flex items-center justify-between space-x-4">
       <Toggle setSentGTTS={setSentGTTS} />
+      {sentGTTS && (
+        <Select
+          isSearchable={false}
+          styles={{
+            control: (styles) => ({
+              ...styles,
+              width: '180px',
+            }),
+          }}
+          placeholder="Select language"
+          options={languageModelOptions}
+          menuPlacement="top"
+          onChange={(e) => setVoiceModel(e.value)}
+        />
+      )}
     </div>
   );
 };

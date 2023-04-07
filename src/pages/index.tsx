@@ -294,8 +294,9 @@ export default function Home() {
             </button> */}
       <div className="">
         {/* GTTS setting */}
-        <div className="hidden sm:flex sm:justify-between sm:items-center sm:space-x-2 bg-gray-300 sm:p-2 sm:rounded-t-md">
+        <div className="hidden sm:flex sm:justify-between sm:items-center sm:space-x-2 bg-gray-300 sm:p-2 sm:rounded-t-md ">
           <SettingGTTS
+            sentGTTS={sentGTTS}
             setVoiceModel={setVoiceModel}
             setSentGTTS={setSentGTTS}
           />
@@ -309,9 +310,11 @@ export default function Home() {
           />
         </div>
 
+        {/* dropdown menu */}
         {isOpen && (
-          <div className="sm:hidden  bg-gray-100 p-2 ">
+          <div className="sm:hidden  bg-gray-100 p-2 space-y-4">
             <SettingGTTS
+              sentGTTS={sentGTTS}
               setVoiceModel={setVoiceModel}
               setSentGTTS={setSentGTTS}
             />
