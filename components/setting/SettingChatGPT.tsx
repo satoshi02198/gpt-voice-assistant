@@ -1,5 +1,5 @@
 import React, { Dispatch, SetStateAction } from 'react';
-import { AudioData, Message } from '../Recorder';
+import { AudioData, Message } from '../../src/pages';
 import Select from 'react-select';
 import { roleModelOptions, wordsLongOptions } from '../../lib/modelsForGPT';
 
