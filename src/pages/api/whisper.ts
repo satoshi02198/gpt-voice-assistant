@@ -1,6 +1,6 @@
 const FormData = require('form-data');
 import { withFileUpload } from 'next-multiparty';
-import { createReadStream } from 'fs';
+import { PathLike, createReadStream } from 'fs';
 import fetch from 'node-fetch';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { IncomingForm } from 'formidable';
@@ -42,7 +42,7 @@ export default async function handler(
 
             formData.append(
               'file',
-              createReadStream(file.filepath),
+              createReadStream(file._writeStream.path),
               'audio.webm'
             );
             formData.append('model', 'whisper-1');
