@@ -4,7 +4,6 @@ import { PathLike, createReadStream } from 'fs';
 import fetch from 'node-fetch';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { IncomingForm, PersistentFile } from 'formidable';
-import PersistentFile from 'formidable/PersistentFile';
 
 export const config = {
   api: {
