@@ -46,7 +46,7 @@ export default async function handler(
 
             formData.append(
               'file',
-              createReadStream(file._writeStream.path),
+              createReadStream(file.filepath),
               'audio.webm'
             );
             formData.append('model', 'whisper-1');
