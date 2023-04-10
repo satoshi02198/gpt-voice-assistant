@@ -1,9 +1,9 @@
 const FormData = require('form-data');
 import { withFileUpload } from 'next-multiparty';
-import { PathLike, createReadStream } from 'fs';
+import { createReadStream } from 'fs';
 import fetch from 'node-fetch';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { IncomingForm, PersistentFile } from 'formidable';
+import { IncomingForm } from 'formidable';
 
 export const config = {
   api: {

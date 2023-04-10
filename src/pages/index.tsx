@@ -6,7 +6,6 @@ import { fetchWithRetry } from '../../utils/fetchWithRetry';
 import ChatInput from '../../components/ChatInput';
 import Skelton from '../../components/layouts/Skelton';
 
-import AccordionComponent from '../../components/layouts/Accordion';
 import SettingGTTS from '../../components/setting/SettingGTTS';
 import SettingChatGPT from '../../components/setting/SettingChatGPT';
 import { BarsArrowUpIcon, BarsArrowDownIcon } from '@heroicons/react/24/solid';
@@ -143,27 +142,17 @@ export default function Home() {
   const getResFromChatGPTAndGTTS = async () => {
     setLoading(true);
     setError('');
-    // try {
-    //   console.log('messagesArray in gptRequest fn', messageArray);
-    //   const toChatGPT = await fetchWithRetry('/api/chatgpt', {
-    //     method: 'POST',
-    //     headers: {
-    //       'Content-Type': 'application/json',
-    //     },
-    //     body: JSON.stringify({
-    //       model: 'gpt-3.5-turbo',
-    //       messages: messageArray,
-    //     }),
-    //   });
 
-    //   const res = await toChatGPT.json();
     try {
+      //? first get response from chatGPT
       const res = await getResFromChatGPT();
-      console.log('🚀 ~ getResFromChatGPTAndGTTS ~ resFromChatGPT:', res);
 
+      //? set Message Array if sentGTTS is true
       if (res.content && sentGTTS) {
         setMessageArray((prev) => [...prev, res]);
         const newAudio = { audioUrl: null };
+
+        //? then get response from google text to speech and set AudioArray
         const audio = await getResFromGTTS(res.content);
         newAudio.audioUrl = audio;
         setAudioArray((prev) => [...prev, newAudio]);
@@ -172,8 +161,6 @@ export default function Home() {
         setAudioArray((prev) => [...prev, { audioUrl: null }]);
       }
       setLoading(false);
-
-      console.log(res);
     } catch (error) {
       console.error('Error at getResFromChatGPTAndGTTS', error);
       setLoading(false);
@@ -182,7 +169,7 @@ export default function Home() {
 
   //? updataMessageArray from recording
   const updateMessageFromWhisper = async (userMessage: string) => {
-    const userMessageData = {
+    const userMessageData: MessageSchema = {
       role: 'user',
       content: userMessage,
     };
@@ -191,8 +178,11 @@ export default function Home() {
 
   //? record and update
   const recording = async (audioBlob: Blob) => {
+    //? setAudioArray of user
+    //? setAudioArray of assistant is in getResFromChatGPTAndGTTS()
     const audioUrl = URL.createObjectURL(audioBlob);
     setAudioArray((prev) => [...prev, { audioUrl: audioUrl }]);
+
     const formData = new FormData();
     formData.append('file', audioBlob, 'audio.webm');
     formData.append('voiceInput', voiceInput);
@@ -256,7 +246,7 @@ export default function Home() {
               className="text-xl"
             ></div>
             {message.role === 'system' && (
-              <p className="px-4 py-2 mt-2 bg-amber-300 sm:w-1/5">
+              <p className="px-4 py-2 mt-2 bg-amber-300 w-44  text-center">
                 character setting
               </p>
             )}
@@ -278,9 +268,6 @@ export default function Home() {
         )}
       </div>{' '}
       {loading && <Skelton />}
-      {/* <div className="">
-        <AccordionComponent />
-      </div> */}
       {/* separate control for audiorecorder */}
       {/* <button
               className="bg-slate-300 py-2 px-4"
@@ -333,7 +320,7 @@ export default function Home() {
           </div>
         )}
 
-        {/* dropdown */}
+        {/* dropdown bar */}
         <div
           className="sm:hidden bg-gray-200 w-full h-8 flex justify-between items-center hover:bg-gray-300 focus:bg-gray-300 active:bg-gray-400 transition duration-200 ease-in-out px-8"
           onClick={() => setIsOpen(!isOpen)}
@@ -347,7 +334,7 @@ export default function Home() {
         </div>
 
         {/* input area */}
-        <div className="flex flex-col items-center justify-center z-50   w-full  bg-gray-100 ">
+        <div className="flex  items-center justify-center z-50  w-full  bg-gray-100 ">
           <div className="flex justify-end items-center space-x-1 px-2 py-2 sm:px-8 w-full">
             {!recorderControls.isRecording && (
               <ChatInput

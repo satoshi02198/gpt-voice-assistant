@@ -1,7 +1,12 @@
 export const languageOutputOptions = [
-  { value: 'en-GB', label: 'English-GB' },
-  { value: 'en-US', label: 'English-US' },
-  { value: 'ja-JP', label: 'Japanese' },
+  { value: 'en-GB-male', label: 'English-GB(male)' },
+  { value: 'en-GB-female', label: 'English-GB(female)' },
+  { value: 'en-US-male', label: 'English-US(male)' },
+  { value: 'en-US-female', label: 'English-US(female)' },
+  { value: 'en-AU-male', label: 'English-AU(male)' },
+  { value: 'en-AU-female', label: 'English-AU(female)' },
+  { value: 'ja-JP-male', label: 'Japanese(male)' },
+  { value: 'ja-JP-female', label: 'Japanese(female)' },
 ];
 
 export const languageInputOptions = [
