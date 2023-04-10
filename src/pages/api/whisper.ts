@@ -3,7 +3,8 @@ import { withFileUpload } from 'next-multiparty';
 import { PathLike, createReadStream } from 'fs';
 import fetch from 'node-fetch';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { IncomingForm } from 'formidable';
+import { IncomingForm, PersistentFile } from 'formidable';
+import PersistentFile from 'formidable/PersistentFile';
 
 export const config = {
   api: {
@@ -39,6 +40,10 @@ export default async function handler(
             }
 
             const formData = new FormData();
+
+            if (Array.isArray(file)) {
+              throw new Error('Multiple files are not supported');
+            }
 
             formData.append(
               'file',
