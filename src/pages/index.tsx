@@ -67,6 +67,7 @@ export default function Home() {
   //? settings for GTTS and Chat GPT
   const [sentGTTS, setSentGTTS] = useState<boolean>(false);
   const [voiceModel, setVoiceModel] = useState<string>('');
+  const [voiceInput, setVoiceInput] = useState<string>('');
   const [role, setRole] = useState<string>('');
   const [wordLong, setWordLong] = useState<string>('');
 
@@ -194,6 +195,7 @@ export default function Home() {
     setAudioArray((prev) => [...prev, { audioUrl: audioUrl }]);
     const formData = new FormData();
     formData.append('file', audioBlob, 'audio.webm');
+    formData.append('voiceInput', voiceInput);
 
     try {
       const response = await fetch('/api/whisper', {
@@ -205,7 +207,7 @@ export default function Home() {
       updateMessageFromWhisper(text);
       setError(error);
     } catch (error) {
-      setError(error);
+      setError(error.message);
       console.log('Error in recording', error);
     }
   };
@@ -298,6 +300,7 @@ export default function Home() {
           <SettingGTTS
             sentGTTS={sentGTTS}
             setVoiceModel={setVoiceModel}
+            setVoiceInput={setVoiceInput}
             setSentGTTS={setSentGTTS}
           />
           <SettingChatGPT
@@ -316,6 +319,7 @@ export default function Home() {
             <SettingGTTS
               sentGTTS={sentGTTS}
               setVoiceModel={setVoiceModel}
+              setVoiceInput={setVoiceInput}
               setSentGTTS={setSentGTTS}
             />
             <SettingChatGPT

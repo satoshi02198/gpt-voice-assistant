@@ -36,10 +36,8 @@ export default async function handler(
 
     try {
       const [response]: any = await client.synthesizeSpeech(request);
-      console.log('🚀 ~ response:', response);
 
       const audioContent = response.audioContent;
-      console.log('🚀 ~ handler ~ audioContent:', audioContent);
       res.setHeader('Content-Type', 'audio/mpeg');
       res.send(audioContent);
     } catch (err) {

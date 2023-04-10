@@ -1,7 +1,16 @@
-export const languageModelOptions = [
-  { value: 'en-GB', label: 'en-GB' },
-  { value: 'en-US', label: 'en-US' },
-  { value: 'ja-JP', label: 'ja(日本語)' },
+export const languageOutputOptions = [
+  { value: 'en-GB', label: 'English-GB' },
+  { value: 'en-US', label: 'English-US' },
+  { value: 'ja-JP', label: 'Japanese' },
+];
+
+export const languageInputOptions = [
+  {
+    value: 'en',
+    label: 'English',
+  },
+
+  { value: 'ja', label: 'Japanese' },
 ];
 
 export const roleModelOptions = [
