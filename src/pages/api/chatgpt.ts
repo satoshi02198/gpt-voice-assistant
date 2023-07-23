@@ -30,7 +30,7 @@ export default async function handler(
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-3.5-turbo',
+        model: req.body.model,
         messages: req.body.messages,
       }),
     });
